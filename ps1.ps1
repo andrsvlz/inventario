@@ -250,23 +250,17 @@ If ($Mon_Manufacturer_Friendly -eq $null) {
 $Mon_Manufacturer_Friendly = $Mon_Manufacturer
 }
 
-$Monitor_Obj = [PSCustomObject]@{
-Manufacturer     = $Mon_Manufacturer_Friendly
-Model            = $Mon_Model
-SerialNumber     = $Mon_Serial_Number
-AttachedComputer = $Mon_Attached_Computer
+$Monitor_Obj=[PSCustomObject]@{
+Manufacturer=$Mon_Manufacturer_Friendly
+Model=$Mon_Model
+SerialNumber=$Mon_Serial_Number
+AttachedComputer=$Mon_Attached_Computer
 }
-
-$Monitor_Array += $Monitor_Obj
-
+$Monitor_Array+=$Monitor_Obj
 }
-
-
 $cedula=""
 $strSID=""
 $Name=""
-
-
 $strSID = Get-WmiObject -Class  win32_computersystem  -ComputerName $computer | Select-Object -ExpandProperty username
 
 $strSID = $strSID.split("\") | select-object -last 1
@@ -315,13 +309,9 @@ applications="$apptotal2"
 } | ConvertTo-Json -Compress
 #$apptotal2
 $item = $item.Replace("\r\n","")
-
- 
 $token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250cmF0byI6IlNLQyBTRVQiLCJfaWQiOiI1ZDZjN2Y1YThlYzMzYjAwMDYyODgxODkiLCJpYXQiOjE2MDA5MTk3MjJ9._eyzT-RS4CDjx9lFEiC-TFW9x6hhvYhEECJwrZdulG0'
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("Authorization", "Bearer $token")
-
-
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
 invoke-WebRequest -UseBasicParsing https://mosaico.arus.com.co:3000/dispositivo-inventario/agent/no-collector -ContentType "application/json; charset=utf-8" -Method POST -Body $item -Headers $headers 
