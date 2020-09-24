@@ -11,7 +11,7 @@ cmd /c sc \\$StrComputer start remoteregistry
 Function Get-RemoteProgram {
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
-[Parameter(ValueFromPipeline              =$true,
+[Parameter(ValueFromPipeline=$true,
 ValueFromPipelineByPropertyName=$true,
 Position=0
 )]
@@ -25,7 +25,6 @@ $ExcludeSimilar,
 [int]
 $SimilarWord
 )
-
 begin {
 $RegistryLocation = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\',
 'SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\'
@@ -46,8 +45,7 @@ $CurrentRegKey = $RegBase.OpenSubKey($CurrentReg)
 if ($CurrentRegKey) {
 $CurrentRegKey.GetSubKeyNames() | ForEach-Object {
 if ($Property) {
-foreach ($CurrentProperty in $Property) {
-                                                    
+foreach ($CurrentProperty in $Property) {                                                    
 $HashProperty.$CurrentProperty = ($RegBase.OpenSubKey("$CurrentReg$_")).GetValue($CurrentProperty)
 }
 }
@@ -76,7 +74,7 @@ $_
 } -End {
 if ($ExcludeSimilar) {
 $Array | Select-Object -Property *,@{
-name       = 'GroupedName'
+name='GroupedName'
 expression = {
 ($_.ProgramName -split $Regex)[1]
 }
