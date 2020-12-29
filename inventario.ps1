@@ -1,4 +1,4 @@
-$ErrorActionPreference = "SilentlyContinue"
+#$ErrorActionPreference = "SilentlyContinue"
                 $StrComputer = $env:COMPUTERNAME
                 if(!([Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine, $StrComputer))){
                 cmd /c sc \\$StrComputer config remoteregistry start= auto
