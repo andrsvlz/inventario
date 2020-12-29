@@ -367,4 +367,4 @@ $ErrorActionPreference = "SilentlyContinue"
                 } | ConvertTo-Json -Compress
                 #$apptotal2
                 $item = $item.Replace("\r\n","")
-                $item
+              write-host  $item
