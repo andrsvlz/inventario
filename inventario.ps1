@@ -267,7 +267,7 @@
                   $windows = New-Object -Type PSObject |
                              Add-Member -MemberType NoteProperty -Name Caption -Value (Get-WmiObject -Class Win32_OperatingSystem).Caption -PassThru |
                              Add-Member -MemberType NoteProperty -Name Version -Value $osversion           -PassThru  
-                  $version_sistema_operativo=  "{0} {1} {2}" -f $windows.Version, "Compilación", $osversion.Build
+                  $version_sistema_operativo=  "{0} {1} {2}" -f $windows.Version, "Compilacion", $osversion.Build
                 
                   
                   
