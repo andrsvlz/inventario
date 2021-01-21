@@ -263,7 +263,15 @@
                 cedula=""
                 $strSID=""
                 $Name=""
-
+                  $osversion=[Environment]::OSVersion.Version
+                  $windows = New-Object -Type PSObject |
+                             Add-Member -MemberType NoteProperty -Name Caption -Value (Get-WmiObject -Class Win32_OperatingSystem).Caption -PassThru |
+                             Add-Member -MemberType NoteProperty -Name Version -Value $osversion           -PassThru  
+                  $version_sistema_operativo=  "{0} {1} {2}" -f $windows.Version, "Compilación", $osversion.Build
+                
+                  
+                  
+                  
                  function getusername {
                    $Days='20'
                    $events = @()
@@ -342,11 +350,11 @@
                 5{$comunicacion= "Primary Domain Controller"}
                 default{$comunicacion="Undetermined Domain Role"}
                 }
-
+               
                 $apptotal2 = ( $apptotal | ConvertTo-Json )
 
                 $apptotal2= $apptotal2.Replace("\r\n","")
-
+                
                 $item= @{
                 usurario=$strSID
                 type=$tipo
@@ -364,6 +372,7 @@
                 monitor=$Monitor_Array.manufacturer
                 monitorodel=$Monitor_Array.model
                 applications="$apptotal2"
+                version_sistema_operativo=$version_sistema_operativo
                 } | ConvertTo-Json -Compress
                 #$apptotal2
                 $item = $item.Replace("\r\n","")
