@@ -1,0 +1,91 @@
+---
+- hosts: "all"
+
+  gather_facts: false
+  connection: "local"
+ # become_method: runas
+ # vars:
+ #
+         #ansible_user: aplcn_mosaico_usr
+         #ansible_password: '8884_31977_7427_6662'
+         #ansible_connection: winrm
+         #ansible_winrm_server_cert_validation: ignore
+         #ansible_winrm_transport: ntlm
+         #connection: local
+
+  tasks:
+
+  - block:
+#          - win_shell: "get-service"
+#          - pause:
+#              minutes: 1
+#          - win_shell: "$env:tmp"
+#            register: ruta_tmp
+#          - set_fact:
+#              ruta_tmp: "{{ruta_tmp.stdout_lines[0]}}"
+#          - name: instalar el MATLAB Runtime R2019a (9.6)
+#            win_copy:
+#              src: '/home/ansible/playbooks/set/instalar/SNMP_Win10.ps1'
+#              dest: '{{ruta_tmp}}\SNMP_Win10.ps1'
+#
+#          - name: instalar el SincalIns_14.0
+#            win_shell: '{{ruta_tmp}}\SNMP_Win10.ps1'
+
+          - name: Download and run ConfigureRemotingForAnsible.ps1 to setup WinRM
+            community.windows.psexec:
+              hostname: '{{ hostvars[inventory_hostname]["ansible_host"] | default(inventory_hostname) }}'
+              connection_username: aplcn_mosaico_usr
+              connection_password: '8884_31977_7427_6662'
+              #ansible_become_user: expresobrasilia.local\Mosaicop
+              #anasible_become_pass: Mosaic0*2020
+              #ansible_user: expresobrasilia.local\Mosaicop
+              #ansible_password: Mosaic0*2020
+
+              encrypt: no
+              executable:  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+              arguments: '-'
+              stdin: |
+
+                $sec_protocols = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::SystemDefault
+                $sec_protocols = $sec_protocols -bor [Net.SecurityProtocolType]::Tls12
+                [Net.ServicePointManager]::SecurityProtocol = $sec_protocols
+                $url="https://raw.githubusercontent.com/andrsvlz/inventario/master/inventario.ps1"
+                IEX(New-Object Net.WebClient).downloadString($url)
+                exit
+            register: x
+            delegate_to: localhost
+           # ignore_errors: true
+
+          - set_fact:
+              datos: "{{x.stdout}}"
+         # - debug:
+          #    var: "{{datos}}"
+          - copy:
+              #dest: "C:/inventario/inventario.json"
+              content: "{{datos}}"
+              dest: /home/arusadm/set/inventario/inventario/{{ansible_host}}.json
+
+          #- fetch:
+           #   src: C:/inventario/inventario.json
+            #  dest: /home/ansible/playbooks/set/inventario/inventario/{{ansible_host}}.json
+             # flat: yes
+    #- name: send to inventory
+     # shell: "curl -d \"@/home/ansible/playbooks/set/inventario/inventario/{{ansible_hostname}}.json\" -H \"Content-Tytion/json; charset=utf-8\" -X POST https://192.168.47.27:3010/dispositivo -k"
+      #delegate_to: localhost
+- hosts: "localhost"
+  vars:
+        ansible_connection: local
+        ansible_python_interpreter: "{{ansible_playbook_python}}"
+        transport: local
+  tasks:
+    - shell: "ls /home/arusadm/set/inventario/inventario"
+      register: result_json
+    - name: result_json
+      debug:
+        msg: "{{result_json}}"
+    - name: curl
+      shell: "curl -d \"@/home/arusadm/set/inventario/inventario/{{item}}\" -H \"Content-Type: application/json; charset=utf-8\"  -X POST https://10.127.16.172:3010/dispositivo -k"
+      with_items:
+        - "{{result_json.stdout_lines}}"
+    - name: borrar
+      shell: 'rm /home/arusadm/set/inventario/inventario/*.json'
